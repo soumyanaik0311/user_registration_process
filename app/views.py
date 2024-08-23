@@ -4,8 +4,8 @@ from django.shortcuts import render
 from app.forms import *
 from django.http import HttpResponse,HttpResponseRedirect
 from django.core.mail import send_mail
-
-from django.contrib.auth import authenticate,login
+from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
 def registration(request):
@@ -44,12 +44,16 @@ def registration(request):
     return render(request,'registration.html',d)
 
 
+
+
 def home(request):
     if request.session.get('username'):  
         username=request.session.get('username')
         d={'username':username}
         return render(request,'home.html',d) #returning home page with login request and session
     return render(request,'home.html')
+
+
 
 def user_login(request):
 
@@ -64,3 +68,17 @@ def user_login(request):
         else:
             return HttpResponse('Invalid Credentials!!')
     return render(request,'user_login.html')
+
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('home'))
+
+@login_required
+def display_data(request):
+    username=request.session['username']
+    UO=User.objects.get(username=username)
+    PO=ProfilePic.objects.get(username=UO)
+    d={'UO':UO,'PO':PO}
+    return render(request,'display_data.html',d)
