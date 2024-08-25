@@ -1,12 +1,18 @@
 from django.shortcuts import render
 
 # Create your views here.
+import random
 from app.forms import *
 from django.http import HttpResponse,HttpResponseRedirect
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.utils import timezone
+from django.conf import settings
+from app.models import *
+from app.forms import *
+
 
 def registration(request):
 
@@ -82,3 +88,83 @@ def display_data(request):
     PO=ProfilePic.objects.get(username=UO)
     d={'UO':UO,'PO':PO}
     return render(request,'display_data.html',d)
+
+@login_required
+def change_pw(request):
+    if request.method=='POST':
+        cpw=request.POST['cpw']
+        username=request.session['username']
+        UO=User.objects.get(username=username)
+        UO.set_password(cpw)
+        UO.save()
+        return HttpResponse('Password has been changed !')
+    return render(request,'change_pw.html')
+
+
+
+
+
+
+def reset_pw(request):
+    if request.method == 'POST':
+        if 'send_otp' in request.POST:
+            # Step 1: Generate and send OTP
+            username = request.POST.get('username')
+            # print(f"Received username for OTP: {username}")  # Debugging print
+
+
+            UO = User.objects.filter(username__iexact=username)[0]
+            otp = str(random.randint(100000, 999999))
+            PO = ProfilePic.objects.filter(username=UO)[0]
+            PO.otp = otp
+                # PO.otp_created_at = timezone.now()
+            PO.save()
+
+                # Send OTP via email
+            send_mail(
+                    'Password Reset OTP',
+                    f'Your OTP for password reset is {otp}.',
+                    settings.EMAIL_HOST_USER,
+                    [UO.email],
+                    fail_silently=False,
+            )
+            return HttpResponse('OTP has been sent to your email.')
+
+            
+
+        elif 'verify_otp' in request.POST:
+            # Step 2: Verify OTP and Reset Password
+            form = PasswordResetOTPForm(request.POST)
+            if form.is_valid():
+                username = form.cleaned_data['username']
+                otp = form.cleaned_data['otp']
+                new_password = form.cleaned_data['new_password']
+                
+                # print(f"Verifying OTP for user: {username}")  # Debugging print
+
+              
+                UO = User.objects.filter(username__iexact=username)[0]
+                PO = ProfilePic.objects.filter(username=UO)[0]
+                if PO.otp == otp:
+                        UO.set_password(new_password)
+                        UO.save()
+                        PO.otp = None
+                        # PO.otp_created_at = None
+                        PO.save()
+                        return HttpResponse('Password has been reset successfully.')
+                else:
+                        # print("Invalid OTP or OTP expired")  # Debugging print
+                        return HttpResponse('Invalid OTP or OTP expired.')
+              
+            else:
+                return render(request, 'reset_pw.html', {'form': form}) # Render the form with validation errors
+
+    else:
+        form = PasswordResetOTPForm()  # Initialize a new, empty form for GET requests or non-submission cases
+    return render(request, 'reset_pw.html', {'form': form}) # Render the template with the form
+
+
+
+
+
+

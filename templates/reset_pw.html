@@ -1,0 +1,33 @@
+{% extends 'dummy.html' %}
+
+{% block title %}
+    <title>Reset Password</title>
+
+{% endblock %}
+
+{% block body_block %}
+<center>
+    <h1>Reset Password</h1> 
+
+    <form method="POST">
+     {% csrf_token %}
+     <label for="username">Username</label>
+     <input type="text" name="username" id="username" required><br>
+     
+     
+     <button type="submit" name="send_otp" class="btn btn-primary">SEND OTP</button><br>
+
+    </form>
+
+
+    <!-- Form for verifying OTP and resetting password -->
+    <form method="POST">
+        {% csrf_token %}
+        <br>
+        {{ form.as_p }}
+        <button type="submit" name="verify_otp" class="btn btn-primary">Reset Password</button>
+    </form>
+      
+    </div>
+</center>
+{% endblock %}
