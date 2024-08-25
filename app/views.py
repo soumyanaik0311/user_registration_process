@@ -3,7 +3,6 @@ from django.shortcuts import render
 # Create your views here.
 import random
 from app.forms import *
-<<<<<<< HEAD
 from django.http import HttpResponse,HttpResponseRedirect
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate,login,logout
@@ -14,9 +13,6 @@ from django.conf import settings
 from app.models import *
 from app.forms import *
 
-=======
-from django.http import HttpResponse
->>>>>>> e5380d70f191b66af5fb6aeba06def7b8ad082a6
 
 def registration(request):
 
@@ -42,7 +38,6 @@ def registration(request):
             return HttpResponse('Registration Unsuccessfull')
 
 
-<<<<<<< HEAD
     return render(request,'registration.html',d)
 
 
@@ -164,6 +159,3 @@ def reset_pw(request):
 
 
 
-=======
-    return render(request,'registration.html',d)
->>>>>>> e5380d70f191b66af5fb6aeba06def7b8ad082a6
