@@ -23,12 +23,15 @@ from app.views import *
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("registration/",registration,name='registration'),
+<<<<<<< HEAD
     path("home/",home,name='home'),
     path("user_login/",user_login,name='user_login'),
     path("user_logout/",user_logout,name='user_logout'),
     path("display_data/",display_data,name='display_data'),
     path("change_pw/",change_pw,name='change_pw'),
     path("reset_pw/",reset_pw,name='reset_pw'),
+=======
+>>>>>>> e5380d70f191b66af5fb6aeba06def7b8ad082a6
 
 
 
